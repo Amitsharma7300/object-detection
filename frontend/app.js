@@ -112,7 +112,7 @@ async function detectObjects(imageData) {
         const response = await fetch(`${CONFIG.API_URL}/detect`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
                 'ngrok-skip-browser-warning': 'true' 
             },
             body: JSON.stringify({ image: imageData })
@@ -134,7 +134,7 @@ async function updateServerConfig() {
         await fetch(`${CONFIG.API_URL}/config`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
                     'ngrok-skip-browser-warning': 'true' 
             },
             body: JSON.stringify({
