@@ -15,7 +15,13 @@ import cv2
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)  # Enable CORS for frontend communication
+CORS(app, resources={
+    r"/api/*": {  # Apply to all routes starting with /api/
+        "origins": ["http://localhost:3000", "https://object-detection-bice.vercel.app"],
+        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "allow_headers": ["Content-Type"]
+    }
+})
 
 # Global variables
 model = None
