@@ -113,6 +113,7 @@ async function detectObjects(imageData) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
+                'ngrok-skip-browser-warning': 'true' 
             },
             body: JSON.stringify({ image: imageData })
         });
@@ -134,6 +135,7 @@ async function updateServerConfig() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
+                    'ngrok-skip-browser-warning': 'true' 
             },
             body: JSON.stringify({
                 confidence_threshold: CONFIG.CONFIDENCE_THRESHOLD
