@@ -7,7 +7,7 @@
 // CONFIGURATION
 // ============================================
 const CONFIG = {
-    API_URL: 'http://34.143.179.13:5000',
+    API_URL: 'https://nayeli-geotropic-untheatrically.ngrok-free.dev',
     DETECTION_INTERVAL: 50,  // ms between detections (50ms = ~20 FPS max)
     MAX_CANVAS_WIDTH: 640,    // Resize frames for faster processing
     CONFIDENCE_THRESHOLD: 0.25,
