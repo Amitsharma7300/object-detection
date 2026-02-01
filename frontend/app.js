@@ -7,7 +7,7 @@
 // CONFIGURATION
 // ============================================
 const CONFIG = {
-    API_URL: 'https://nayeli-geotropic-untheatrically.ngrok-free.dev',
+    API_URL: 'api',
     DETECTION_INTERVAL: 50,  // ms between detections (50ms = ~20 FPS max)
     MAX_CANVAS_WIDTH: 640,    // Resize frames for faster processing
     CONFIDENCE_THRESHOLD: 0.25,
@@ -112,8 +112,7 @@ async function detectObjects(imageData) {
         const response = await fetch(`${CONFIG.API_URL}/detect`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'ngrok-skip-browser-warning': 'true' 
+                'Content-Type': 'application/json' 
             },
             body: JSON.stringify({ image: imageData })
         });
@@ -134,8 +133,7 @@ async function updateServerConfig() {
         await fetch(`${CONFIG.API_URL}/config`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                    'ngrok-skip-browser-warning': 'true' 
+                'Content-Type': 'application/json' 
             },
             body: JSON.stringify({
                 confidence_threshold: CONFIG.CONFIDENCE_THRESHOLD
