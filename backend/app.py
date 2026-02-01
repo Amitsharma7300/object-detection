@@ -15,22 +15,21 @@ import cv2
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app, resources={
-    r"/api/*": {  # Apply to all routes starting with /api/
-        "origins": ["http://localhost:3000", "https://object-detection-bice.vercel.app"],
-        "methods": ["GET", "POST", "PUT", "DELETE"],
-        "allow_headers": ["Content-Type"]
-    }
-})
+CORS(app)  # Enable CORS for frontend communication
 
 # Global variables
 model = None
 MODEL_PATH = os.path.join(os.path.dirname(__file__), '..', 'model', 'best.pt')
-CONFIDENCE_THRESHOLD = 0.6  # Higher threshold to reduce false detections
+CONFIDENCE_THRESHOLD = 0.5  # Balanced threshold
 IOU_THRESHOLD = 0.45
 INPUT_SIZE = 640
 USE_GPU = True  # Set to False to force CPU
 USE_HALF = False  # FP16 disabled - causes dtype issues with this model
+
+# Size filters disabled - using model confidence only
+MAX_BOX_RATIO = 1.0  # No limit
+MIN_BOX_SIZE = 5     # Very small minimum
+MAX_BOX_SIZE = 2000  # Very large maximum (effectively disabled)
 
 # Class names - MUST match model's class order: {0: 'Bolt', 1: 'Nut'}
 CLASS_NAMES = ['Bolt', 'Nut']  # Fixed: matches model's class indices
@@ -134,10 +133,37 @@ def run_detection(image):
         for result in results:
             boxes = result.boxes
 
+            # Debug: print number of raw detections
+            if boxes is not None and len(boxes) > 0:
+                print(f"🔍 Found {len(boxes)} detection(s) with conf >= {CONFIDENCE_THRESHOLD}")
+
             if boxes is not None:
                 for box in boxes:
                     # Get bounding box coordinates
                     x1, y1, x2, y2 = box.xyxy[0].tolist()
+
+                    # Calculate box dimensions
+                    box_width = x2 - x1
+                    box_height = y2 - y1
+                    box_area = box_width * box_height
+                    img_height, img_width = image.shape[:2]
+                    img_area = img_width * img_height
+
+                    # Filter 1: Skip if box is too large (like a cup or large object)
+                    if box_width > MAX_BOX_SIZE or box_height > MAX_BOX_SIZE:
+                        print(f"⚠️ Skipping: Box too large ({box_width:.0f}x{box_height:.0f} > {MAX_BOX_SIZE})")
+                        continue
+
+                    # Filter 2: Skip if box is too small (noise)
+                    if box_width < MIN_BOX_SIZE or box_height < MIN_BOX_SIZE:
+                        print(f"⚠️ Skipping: Box too small ({box_width:.0f}x{box_height:.0f} < {MIN_BOX_SIZE})")
+                        continue
+
+                    # Filter 3: Skip if box takes up too much of the image
+                    box_ratio = box_area / img_area
+                    if box_ratio > MAX_BOX_RATIO:
+                        print(f"⚠️ Skipping: Box ratio too large ({box_ratio:.2f} > {MAX_BOX_RATIO})")
+                        continue
 
                     # Get confidence and class
                     confidence = float(box.conf[0])
@@ -332,7 +358,7 @@ if __name__ == '__main__':
     # Run Flask app
     app.run(
         host='0.0.0.0',
-        port=port,
+        port=5000,
         debug=True,
         threaded=True
     )
