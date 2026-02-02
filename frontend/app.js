@@ -7,7 +7,7 @@
 // CONFIGURATION
 // ============================================
 const CONFIG = {
-    API_URL: 'http://localhost:5000',
+    API_URL: '/api',
     DETECTION_INTERVAL: 50,  // ms between detections (50ms = ~20 FPS max)
     MAX_CANVAS_WIDTH: 640,    // Resize frames for faster processing
     CONFIDENCE_THRESHOLD: 0.25,
