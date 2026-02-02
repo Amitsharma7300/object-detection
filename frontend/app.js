@@ -7,7 +7,7 @@
 // CONFIGURATION
 // ============================================
 const CONFIG = {
-    API_URL: 'api',
+    API_URL: 'http://localhost:5000',
     DETECTION_INTERVAL: 50,  // ms between detections (50ms = ~20 FPS max)
     MAX_CANVAS_WIDTH: 640,    // Resize frames for faster processing
     CONFIDENCE_THRESHOLD: 0.25,
@@ -112,7 +112,7 @@ async function detectObjects(imageData) {
         const response = await fetch(`${CONFIG.API_URL}/detect`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json' 
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({ image: imageData })
         });
@@ -133,7 +133,7 @@ async function updateServerConfig() {
         await fetch(`${CONFIG.API_URL}/config`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json' 
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 confidence_threshold: CONFIG.CONFIDENCE_THRESHOLD
@@ -393,8 +393,13 @@ function updateAPIStatus(isOnline, message) {
  */
 function updateStats(result) {
     elements.totalCount.textContent = result.total || 0;
-    elements.nutCount.textContent = result.counts?.nut || 0;
-    elements.boltCount.textContent = result.counts?.bolt || 0;
+
+    // Support both lowercase and capitalized class names
+    const nutCount = (result.counts?.Nut || result.counts?.nut || 0);
+    const boltCount = (result.counts?.Bolt || result.counts?.bolt || 0);
+
+    elements.nutCount.textContent = nutCount;
+    elements.boltCount.textContent = boltCount;
     elements.processingTime.textContent = `${result.processing_time_ms || 0} ms`;
 }
 
